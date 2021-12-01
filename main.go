@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,7 +12,16 @@ import (
 func main() {
 	argsWithoutProg := os.Args[1:]
 
-	c := http.Client{Timeout: time.Duration(1) * time.Second}
+	t := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			// with this settings connection is working:  Renegotiation: tls.RenegotiateOnceAsClient,
+		},
+	}
+
+	c := http.Client{
+		Timeout:   time.Duration(1) * time.Second,
+		Transport: t,
+	}
 	resp, err := c.Get(argsWithoutProg[0])
 	if err != nil {
 		fmt.Printf("Error %s", err)
